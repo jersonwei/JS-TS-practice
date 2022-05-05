@@ -6,7 +6,6 @@
 // 2-当前任务执行完成后 释放队列空间 自动执行下一个任务
 // 3-所有任务添加到任务队列后 自动开始执行任务
 
-
 //  创建任务的函数
 function createTask(i){
     return ()=>{
@@ -43,7 +42,7 @@ class TaskQueue{
            const task = this.taskList.shift()  //  队列的先进先出取出最早的任务
            task().then(res=>{   //  调用成功时执行
                console.log(res)
-           }).catch(err=>{        //  失败时也需要捕捉
+           }).catch(err=>{                                            //  失败时也需要捕捉
                console.log(err)
            }).finally(() => {       //  无论成功失败都需要记录并操作任务数
                this.max++  //  填补任务空间 保持始终有10个任务
