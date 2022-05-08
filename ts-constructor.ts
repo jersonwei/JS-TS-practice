@@ -162,3 +162,55 @@ type GetInstanceType <
 
     // 这样,就能处理任意个数元组的合并
     type tuplel4 = Zip2<[1,2,3,4,6],['a','b','c','d','e']>
+
+    // 字符串类型的重新构造
+
+    // CapitalizeStr 我们想把一个字符串字面量类型的'dong'转换成首字母大写的'Dong'
+
+    // 需要用到字符串类型的提取和重新构造
+        type CapitalizeStr<Str extends string> =
+            Str extends `${infer First}${infer Rest}`
+                ? `${Uppercase<First>}${Rest}`
+                    : Str 
+    
+    // 我们声明了类型参数Str是要处理的字符串类型,通过extends约束为string
+    // 通过infer提取出首个字符到局部变量First.提取后面的字符到局部变量Rest
+
+    // 然后使用TS提供的内置高级类型Uppercase把首字母转为大写
+    // 加上Rest,构造成新的字符串类型返回
+
+    type CapitalizeResult = CapitalizeStr<'dong'>
+
+    // 这就是字符串类型的重新构造:从已有的字符串类型中提取出一些部分字符串
+    // 经过一系列变换,构造成新的字符串类型
+
+    // CamelCase  我们再来实现 dong_dong_dong到dongDongDong的变换
+    // 同样是提取和重新构造
+    type CamelCase<Str extends string> = 
+        Str extends `${infer Left}_${infer Right}${infer Rest}`
+        ? `${Left}${Uppercase<Right>}${CamelCase<Rest>}`
+            :Str
+    
+    // 类型参数Str是待处理的字符串类型,约束为string
+    // 提取_之前和之后的两个字符到infer声明的局部变量Left和Right
+    // 剩下的字符放到Rest里
+
+    // 然后把右边的字符Right大写和Left构造成新的字符串,剩余的字符
+    // Rest要继续递归的处理,这样就完成了从下划线到驼峰形式的转换
+
+    type CamelCaseResult = CamelCase<'dong_dong_dong'>
+
+    // DropSubStr 可以修改自然也可以删除,示例如下
+    type DropSubStr<Str extends string, SubStr extends string> = 
+    Str extends `${infer Prefix}${SubStr}${infer Suffix}`
+        ? DropSubStr<`${Prefix}${Suffix}`,SubStr>
+            : Str
+    
+    // 类型参数Str是待处理的字符串,SubStr是要删除的字符串,都通过extends约束为string
+
+    // 通过模式匹配提取SubStr之前和之后的字符串到infer声明的局部变量Prefix,Suffix中
+    // 如果不匹配就直接返回Str
+
+    // 如果匹配,那就用Prefix,Suffix构造成新的字符串,然后继续递归删除SubStr,直到不再匹配
+
+    type DropResult = DropSubStr<'dingdong','dong'>
