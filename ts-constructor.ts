@@ -286,15 +286,28 @@ type GetInstanceType <
 
     type UppercaseKeyResult = UppercaseKey<{ding:1,dong:2}>
 
+    // Record ts提供了内置的高级类型Record来创建索引类型
 
+    // type Record<K extends string | number | symbol, T> = { [P in K]: T}
 
+    // 指定索引和值的类型分别为K和T.就可以创建一个对应的索引类型
 
+    // 上面的索引类型的约束我们用的object 更语义化一点推荐用Record<string, object>
 
+    type UppercaseKeys<Obj extends Record<string,any>> = {
+        [Key in keyof Obj as Uppercase<Key & string>] : Obj[Key]
+    }
 
+    // 也就是约束类型参数Obj为key为string,值为任意类型的索引类型
 
+    // ToReadonly 索引类型的索引可以添加readonly的修饰符,代表只读
+    type ToReadonly<T> = {
+        readonly [Key in keyof T]: T[Key]
+    }
 
+    // 通过映射类型构造了新的索引类型,给索引加上了readonly的修饰,其余的保持不变
+    // 索引依然为原来的索引Key in keyof T, 值依然为原来的值T[Key]
 
-
-
+    type ToReadonlyResult = ToReadonly<{name:string,age:number}>
 
 
