@@ -1,0 +1,164 @@
+// 构造器
+
+// 构造器和函数的区别是,构造器是用于创建对象的.所以可以被new
+// 同样,我们也可以通过模式匹配提取构造器的参数和返回值的类型
+
+//GetInstanceType 构造器类型可以用interface声明,使用new():xx的语法
+
+interface Person {
+    name:string
+}
+
+interface PersonConstructor {
+    new(name:string): Person
+}
+
+// 这里的PersonConstructor返回的是Person类型的实例对象
+// 这个也可以通过模式匹配出来
+
+type GetInstanceType <
+    ConstructorType extends new(...args:any) => any
+    > = ConstructorType extends new(...args:any) => 
+    infer InstanceType ? InstanceType : any 
+
+    // 类型参数ConsructorType是待处理的类型.通过extends约束为构造器类型
+
+    // 用ConstructorType匹配一个模式类型,提取返回的实例类型到infer声明的
+    // 局部变量InstaceType里.返回InstanceType
+    // 这样就能取出构造器对应的实例类型
+    type GetInstanceTypeRes = GetInstanceType<PersonConstructor>
+
+    // 索引类型
+    // 索引类型也同样可以用模式匹配提取某个索引的值的类型,这个用的也挺多的
+    // 比如React的index.d.ts里的PropsWithRef的高级类型,就是通过模式匹配提取
+    // 了ref的值的类型
+    type PropsWithRef<P> = 
+    'ref' extends keyof P
+        ? P extends {ref?: infer R | undefined}
+            ? string extends R 
+                ? PropsWithRef<P> & {ref: Exclude<R,string> | undefined }
+                : P
+            : p 
+        : P        
+    
+    // 我们简化一下那个高级类型.提取Props里ref的类型
+
+    // GetRefProps  我们同样通过模式匹配的方式提取ref的值的类型
+    type GetRefProps<Props> = 
+        'ref' extends keyof Props 
+            ? Props extends {ref?: infer Value | undefined}
+                ? Value
+                : never
+            : never
+
+    // 类型参数Props为待处理的类型
+
+    // 通过keyofProps取出Props的所有索引构成的联合类型 判断下ref
+    // 是否在其中,也就是`ref` extends keyof Props 
+
+    // 为什么要做这个判断.上面注释里写了
+    // 在ts3.0里面如果没有对应的索引,Obj[key]返回的是{}而不是never,所以这样坐下兼容处理
+
+    // 如果有ref这个索引的话,就通过infer提取Value的类型返回,否则返回never
+    type GetRefPropsRes = GetRefProps<{ref?: 1,name:'ding'}>
+
+    // 当ref为undefined时
+    type GetRefPropsRes2 = GetRefProps<{ref?: undefined,name:'ding'}>
+
+    // 总结 
+
+    // 就像字符串可以匹配一个模式串提取子组一样,
+    // TS类型也可以匹配一个模式类型提取某个部分的类型
+
+    // TS类型的模式匹配时通过类型extends一个模式类型,把需要提取的部分放到
+    // 通过infer声明的局部变量里,后面可以从这个局部变量拿到类型做各种后续处理
+
+    // 模式匹配的套路在数组,字符串,函数,构造器,索引类型,Promise等类型中都有大量的应用
+    // 掌握好这个套路能提升很大一截类型体操水平
+
+    // 类型编程主要的目的就是对类型做各种转换,那么如歌对类型做修改呢
+    // TS类型系统支持3种可以声明任意类型的变量:type,infer类型参数
+
+    // type 叫做类型别名,其实就是声明一个变量存储某个类型
+    type ttt = Promise<number>
+    // infer用于类型的提取,然后存到一个变量里,相当于局部变量
+    type GetValueType3<P> = P extends Promise<infer Value> ? Value:never
+    // 类型参数用于接收具体的类型.在类型运算中也相当于局部变量
+    type isTwo<T> = T extends 2 ?true:false
+    // 但是,严格来说这三种也都不叫变量,因为它们不能被重新赋值
+    // ts设计可以做类型编程的类型系统的目的就是为了产生各种复杂的类型,拿不拿修改怎么产生新类型
+
+    // 重新构造
+
+    // ts的type.infer类型参数声明的变量都不能修改,想对类型做各种变换产生
+    // 新的类型就需要重新构造
+
+    // 数组,字符串,函数等类型的重新构造比较简单
+    // 索引类型,也就是多个元素的聚合类型的重新构造复杂一些,涉及到了映射类型的语法
+
+    // 数组类型的重新构造
+
+    // push  有这样一个元祖类型
+    type tuple = [1,2,3]
+    // 我想给这个元祖类型再添加一些类型,怎么做呢
+
+    // TS类型变量不支持修改,我们可以构造一个新的元祖类型
+    type Push<Arr extends unknown[], Ele> = [...Arr,Ele]
+
+    // 类型参数Arr是要修改的数组/元组类型,元素的类型任意.也就是unknown 
+    // 类型参数Ele是添加的元素的类型
+    // 返回的使用Arr已有的元素加上Ele构造的新的元组类型
+
+    type PushResult = Push<[1,2,3],4>
+
+    // 这就是数组/愿足矣的重新构造
+    
+    // 数组和元组的区别, 数组类型是指任意多个同一类型的元素构成的.比如number[]
+    // Array<number> 而元组则是数量固定,类型可以不同的元素构成的.比如[1,true.'guang']
+
+
+    // Unshift  可以在后面添加 同样也可以在前面添加
+    type Unshift<Arr extends unknown[],Ele> = [Ele,...Arr]
+
+    type UnshiftResult = Unshift<[1,2,3],4>
+
+    // 这两个案例比较简单,下面是个复杂的
+
+    // 有这样两个元组
+    type tuplel = [1,2]
+
+    type tuplel2 = ['shen','zhen']
+    // 我们想把它们合并成这样的元组
+    type tuples = [[1,'shen'],[2,'zhen']]
+    
+    type Zip<One extends [unknown,unknown],Other extends [unknown,unknown]>
+    = One extends [infer OneFirst,infer OneSecond]
+    ? Other extends [infer OtherFirst,infer OtherSecond]
+        ? [[OneFirst,OtherFirst],[OneSecond,OtherSecond]]
+    : []
+        : []
+    
+    // 两个类型参数One,Other是两个元组,
+    // 类型是[unknown,unknown],代表2个任意类型的元素构成的元组
+
+    // 通过infer分别提取One和Other的元素到infer声明的局部变量
+    // OneFirst,OneSecond,OtherFirst,OtherSecond
+
+    // 用提取的元素构造成新的元组返回即可
+    type tuples3 = Zip<tuplel,tuplel2>   //    [[1,'shen'],[2,'zhen']]
+
+    // 但是这样只能合并两个元素的元组.如果是n个呢,那就只能用递归了
+    type Zip2<One extends unknown[],Other extends unknown[]> = 
+    One extends [infer OneFirst,...infer OneRest]
+        ? Other extends [infer OtherFirst,...infer OtherRest] 
+            ? [[OneFirst,OtherFirst],...Zip2<OneRest,OtherRest>]
+        : [] 
+            : []
+
+    // 类型参数One.Other声明为unknown[],也就是元素个数任意.类型任意的数组
+
+    // 每次提取One和Other的第一个元素OneFirst,OtherFirst,剩余的放到
+    // OneRest和OtherRest中递归处理
+
+    // 这样,就能处理任意个数元组的合并
+    type tuplel4 = Zip2<[1,2,3,4,6],['a','b','c','d','e']>
