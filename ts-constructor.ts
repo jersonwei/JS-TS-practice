@@ -232,3 +232,69 @@ type GetInstanceType <
 
     // 这样就完成了函数类型的修改
     type AppendArgumentResult = AppendArgument<(name:string)=>boolean,number>
+
+    // 索引类型的重新构造
+
+    // 索引类型是聚合多个元素的类型
+    type objs = {
+        name:string
+        age:number
+        gender:boolean
+    }
+    // 索引类型可以添加修饰符readonly(可读)、?(可选): 
+    type objs1 = {
+        readonly name:string
+        age?:number
+        gender:boolean
+    }
+    // 对它的修改和构造类型涉及到了映射类型的语法
+    // type Mapping<Obj extends object> = {
+    //     [Key in keyof Obj]: Obj[Key]
+    // }
+
+    // Mapping 映射的过程中可以对value做下修改 
+    type Mapping<Obj extends object> = {
+        [Key in keyof Obj]: [Obj[Key],Obj[Key],Obj[Key]]
+    } 
+
+    // 类型参数Obj是待处理的索引类型,通过extends约束为object
+    // 用keyof取出Obj的索引,作为新的索引类型的索引,也就是 Key in keyof Obj
+
+    // 值的类型可以做变换.这里我们用之前索引类型的值Obj[Key]构造成了
+    // 三个元素的元组类型 [Obj[Key],Obj[Key],Obj[Key]]
+
+    type res = Mapping<{a:1,b:2}>   //  {a:[1,1,1],b:[2,2,2]}
+    // 索引类型的映射如下图所示
+    // a:1 ====> a:[1,1,1]
+    // b:2 ====> b:[2,2,2]
+
+    // UppercaseKey 除了可以对Value做修改,可以对Key做修改.使用as 这叫做重映射
+
+    // 比如把索引类型的Key变为大写
+    type UppercaseKey<Obj extends object> = {
+        [Key in keyof Obj as Uppercase<Key & string>]: Obj[Key]
+    }
+    // 类型参数Obj是待处理的索引类型,通过extends约束为object
+
+    // 新的索引类型的索引为Obj中的索引,也就是Key in keyof Obj 但要做些变换,也就是as之后
+
+    // 通过Uppercase把索引Key转为大写,因为索引可能为string,number,symbol类型,而这里
+    // 只能接受string类型,所以要 & string,也就是取索引中string的部分
+
+    // value保持不变,也就是之前的索引Key对应的值的类型Obj[Key]
+    // 这样构造出的新的索引类型,就把原来索引类型的索引转为了大写
+
+    type UppercaseKeyResult = UppercaseKey<{ding:1,dong:2}>
+
+
+
+
+
+
+
+
+
+
+
+
+
