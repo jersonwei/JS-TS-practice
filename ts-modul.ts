@@ -135,9 +135,88 @@
 
     type TrimResult = Trim<'   gang    '>
 
+// 函数 
+// 函数同样也可以做类型匹配,比如提取参数,返回值的类型
+
+// GetParameters
+// 函数类型可以通过模式匹配来提取参数的类型
+type GetParameters<Func extends Function> = Func extends
+(...args: infer Args) => unknown ? Args:never
+// 类型参数Func是要匹配的函数类型,通过extends约束为Function
+// Func和模式类型做匹配,参数类型放到用infer声明的局部变量Args里
+// 返回值可以是任何类型,用unknown
+
+// 返回提取到的参数类型Args
+type ParametersResult = GetParameters<(name:string,age:number) =>string >
 
 
+// GetReturnType  
+// 能提取参数类型,同样可以提取返回值类型
+type GetReturnType<Func extends Function> = Func extends
+(...args:any[]) => infer ReturnType?
+ReturnType:never
+// Func和模式类型做匹配,提取返回值到通过infer声明的局部变量ReturnType里返回
 
+// 参数类型可以是任意类型,也就是any[](注意,这里不能用unknown,因为参数类型是要赋值给)
+// 别的类型的,而unknown只能用来接收类型,所以用any
 
+type ReturnTypeResult = GetReturnType<()=>'dont'>
 
+// GetThisParameterType  方法里可以调用this 比如这样
 
+class Dong {
+    name:string
+
+    constructor(){
+      this.name = 'ding'
+    }
+
+    wei(){
+      return '喂,我叫: ' + this.name
+    }
+}
+
+const dong = new Dong()
+// dong.wei()
+
+// 用对象.方法名的方式调用的时候.this就指向那个对象
+// 但是方法也可以用call 或者apply调用
+// dong.wei.call({xxx:1})
+
+// call调用的时候,this就变了.但这里却没有被检查出来this指向的错误
+
+// 如何让编译器能够检查出this指向的错误呢
+// 可以在方法声明时指定this的类型
+class Ding {
+  name:string;
+
+  constructor(){
+    this.name = 'ding'
+  }
+
+  wei(this:Ding){
+    return '喂,我叫 ' + this.name
+  }
+}
+// 这样,当call/apply调用的时候,就能检查出this指向的对象是否是对的
+
+const ding = new Ding()
+
+ding.wei()
+
+ding.wei.call({xxx:1})
+
+// 这里的this类型同样也可以通过模式匹配提取出来
+
+type GetThisParameterType<T> = 
+    T extends (this: infer ThisType,...args:any[]) => any
+    ? ThisType : unknown
+
+    // 类型参数T是待处理的类型
+    // 用T匹配一个模式类型,提取this的类型到infer声明的局部变量
+    // ThisType中,其余的参数是任意类型,也就是any,返回值也是任意类型
+
+    // 返回提取到的ThisType 这样就能提取出this的类型
+
+    type GetThisParameterTypeRes = 
+    GetThisParameterType<typeof ding>
