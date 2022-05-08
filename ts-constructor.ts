@@ -312,9 +312,18 @@ type GetInstanceType <
 
 
     // ToPartial  同理,索引类型还可以添加可选修饰符
-    
+
     type ToPartial<T> = {
         [Key in keyof T]?: T[Key]
     }
     // 给索引类型T的索引添加了?可选修饰符,其余保持不变
     type ToPartialResult = ToPartial<{name:string,age:number}>
+
+    // ToMutable  可以添加readonly修饰,当然也可以去掉
+
+    type ToMutable<T> = {
+        -readonly[Key in keyof T]: T[Key]
+    }
+
+    type ToMutableResult = ToMutable<{readonly name:string,readonly age:number}>
+    
