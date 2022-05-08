@@ -327,3 +327,9 @@ type GetInstanceType <
 
     type ToMutableResult = ToMutable<{readonly name:string,readonly age:number}>
     
+    // ToRequired 同理 也可以去掉可选修饰符
+    type ToRequired <T> = {
+        [Key in keyof T]-?: T[Key]
+    }
+
+    type ToRequiredResult = ToRequired<{name?:string,age?:number}>
