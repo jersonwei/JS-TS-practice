@@ -311,3 +311,10 @@ type GetInstanceType <
     type ToReadonlyResult = ToReadonly<{name:string,age:number}>
 
 
+    // ToPartial  同理,索引类型还可以添加可选修饰符
+    
+    type ToPartial<T> = {
+        [Key in keyof T]?: T[Key]
+    }
+    // 给索引类型T的索引添加了?可选修饰符,其余保持不变
+    type ToPartialResult = ToPartial<{name:string,age:number}>
