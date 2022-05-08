@@ -214,3 +214,21 @@ type GetInstanceType <
     // 如果匹配,那就用Prefix,Suffix构造成新的字符串,然后继续递归删除SubStr,直到不再匹配
 
     type DropResult = DropSubStr<'dingdong','dong'>
+
+    // 函数类型的重新构造
+
+    // AppendArgument  我们可以在函数类型上添加一个参数
+
+    type AppendArgument<Func extends Function,Arg > =
+        Func extends (...args:infer Args) => infer ReturnType 
+            ? (...args:[...Args,Arg]) => ReturnType
+                : never 
+
+    // 类型参数Func是待处理的函数类型,通过extends约束为Function,Arg是要添加的参数类型
+
+    // 通过模式匹配提取参数到infer声明的局部变量Args中,提取返回值到局部变量ReturnType中
+
+    // 用Args数组添加Arg构造成新的参数类型,结合ReturnType构造成新的函数类型返回
+
+    // 这样就完成了函数类型的修改
+    type AppendArgumentResult = AppendArgument<(name:string)=>boolean,number>
