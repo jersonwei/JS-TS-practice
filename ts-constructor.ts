@@ -333,3 +333,43 @@ type GetInstanceType <
     }
 
     type ToRequiredResult = ToRequired<{name?:string,age?:number}>
+
+    // FilterByValueType  可以在构造新索引类型的做下过滤
+    type FilterByValueType<Obj extends Record<string,any>
+    ,ValueType> = {
+        [Key in keyof Obj as ValueType extends
+            Obj[Key] ? Key : never]
+                : Obj[Key] 
+    }
+    // 类型参数Obj为要处理的索引类型,通过extends约束为索引为string
+    // 值为任意类型的索引类型Record<string,any>
+
+    // 类型参数ValueType为要过滤出的值的类型
+
+    // 构造新的索引类型，索引为Obj的索引，也就是Key in keyof Obj ,但
+    // 要做一些变换,也就是as之后的部分
+
+    // 如果原来索引的值Obj[Key]是ValueType类型,索引依然为之前的索引Key
+    // 否则索引设置为never,never的索引会在生成新的索引类型时被去掉
+
+    // 值保持不变,依然为原来索引的值,也就是Obj[Key]
+
+    // 这样就达到了过滤索引类型的索引,产生新的索引类型的目的
+
+    interface Person {
+        name:string
+        age:number
+        hobby:string[]
+    }
+
+    type FilterResult = FilterByValueType<Person, string | number>
+
+    // 总结
+    // TS支持type,infer类型参数来保存任意类型,相当于变量的作用
+    // 但其实也不能叫变量,因为他们是不可变的,想要变化就需要重新构造新的类型,并且可以
+    // 在构造新类型的过程中对源类型做一些过滤和变换
+
+    // 数组,字符串,函数,索引类型等都可以用这种方式对源类型做变换产生新的类型,其中
+    // 索引类型有专门的语法叫做映射类型,对索引做修改的as叫做重映射
+
+    // 提取和构造这两者是相辅相成的,很多类型体操都可以根据模式匹配做提取及重新构造做变换的套路
