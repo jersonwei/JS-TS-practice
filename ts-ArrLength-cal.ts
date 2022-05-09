@@ -48,3 +48,18 @@ type Add<Num1 extends number,Num2 extends number> =
      [...BuildArr<Num1>,...BuildArr<Num2>]['length']
 
 type AddResult = Add<223,22>
+
+
+// Substract  加法是构造数组,那减法是从数值中去掉一部分
+// 我们可以通过数组类型的提取来实现
+
+// 比如3是[unknown,unknown,unknown]的数组类型,取出2个后就变成1
+
+type Substract <Num1 extends number,
+                Num2 extends number> = 
+         BuildArr<Num1> extends 
+         [...arr1: BuildArr<Num2>,...arr2: infer Rest]
+         ? Rest['length']
+         : never
+
+type SubstractResult = Substract<25,22>
