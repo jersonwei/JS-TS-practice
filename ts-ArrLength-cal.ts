@@ -63,3 +63,21 @@ type Substract <Num1 extends number,
          : never
 
 type SubstractResult = Substract<25,22>
+
+// Multipy 我们吧加法转换为了数组构造,把剪发转换为了数组提取,那乘法呢
+
+// 这里我们需要在加法的基础上多加一个参数,来传递中间结果的数组,算完之后再取一个length
+
+type Multipy <Num1 extends number,
+              Num2 extends number,
+              ResultArr extends unknown[] = [] > = 
+              Num2 extends 0 ? ResultArr['length']
+              : Multipy<Num1, Substract<Num2,1>,
+              [...BuildArr<Num1>,...ResultArr]>
+
+// 类型参数Num1和Num2分别是被加数和加数
+
+// 因为乘法是多个加法结果的累加,我们使用了一个类型参数ResultArr 来保存中间结果
+// 默认值为[] 相当于从0开始
+
+type MultipyRes = Multipy<2,33>
