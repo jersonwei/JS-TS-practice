@@ -176,3 +176,23 @@ type ReplaceAll2< Str extends string,
     // 这样就完成了不确定长度的字符串的提取和联合类型的构造
 
     type StringToUnion2Result = StringToUnion2<'xdaegdsasd'>
+
+
+    // ReverseString   我们实现了数组的翻转,同样也可以实现字符串的翻转
+
+    type ReverseStr <Str extends string,
+                    Result extends string = ''> = Str extends
+         `${infer First}${infer Rest}`
+         ? ReverseStr<Rest, `${First}${Result}`>
+         : Result
+         
+         
+    // 类型参数Str为待处理的字符窜,类型参数Result为构造出的字符串,默认值是空串
+    
+    // 通过模式匹配提取到第一个字符到infer声明的局部变量First,其余字符放到Rest
+    
+    // 用First和之前的Result构造成新的字符串,吧First放到前面,因为递归是从左到右处理
+    
+    // 那么不断往前插入就相当于把右边的放到了左边,也就完成了字符翻转的功能
+    
+    type ReverseStrResult = ReverseStr<'wasd'>
