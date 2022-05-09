@@ -53,3 +53,39 @@ type resusionArr<Arr extends unknown[]> = Arr extends
     ? [...resusionArr<ArrRest>,First]
     : Arr
 type resusionArrResult = resusionArr<[1,2,3,4,5,6,7,8,9]>
+
+
+// Includes  既然递归可以做循环用,那么查找元素这种自然也可以实现
+// 比如查找[1,2,3,4,5]中是否存在4,是就返回true,否则就返回false
+
+type FindInArr<Arr extends unknown[],FindItem> = Arr extends
+    [infer First, ...infer Rest] 
+    ? IsEqual<First, FindItem> extends true
+        ? true 
+        : FindInArr<Rest, FindItem>
+    : false
+
+type IsEqual<A,B> = (A extends B ? true : false)
+   & (B extends A ? true : false)
+
+// 类型参数Arr是待查找的数组类型,元素类型任意,也就是unknown,FindItem待查找的元素类型
+
+// 每次提取一个元素到infer声明的局部变量First中,剩余的放到局部变量Rest
+
+// 判断First是否是要继续查找的元素,也就是和FindItem相等,是的话就返回true,否则递归判断下一个
+
+// 直到结束条件也就是提取不出下一个元素,这时返回false
+
+// 相等的判断就是A是B的子类型,并且B也是A的子类型,这就就完成了不确定长度的递归循环
+
+type IncludesResult1 = FindInArr<[1,2,3,4,5],4>
+
+type IncludesResult2 = FindInArr<[1,2,3,4,5],6>
+
+
+
+
+
+
+
+
