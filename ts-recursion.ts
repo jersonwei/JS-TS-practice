@@ -107,4 +107,20 @@ type IsEqual2<A,B> = (A extends B ? true : false) & (B extends A ? true : false)
 
 type RemoveInArrResult = RemoveInArr<[1,2,2,3,4,5],2>
 
+// BuildArray 当我们构造数组的时候,也可以使用递归
+// 比如传入5和元素类型,构造一个长度为5的该元素类型构成的数组
 
+type BuildArray <Length extends number,
+     Ele extends unknown,
+     Arr extends unknown[]> = Arr['length'] extends Length
+     ? Arr 
+     : BuildArray<Length,Ele,[...Arr, Ele]>
+    
+// 类型参数Length为数组长度,约束为number,类型参数Ele为元素类型 默认值为unknown
+// 类型参数Arr为构造出的数组,默认值为[]
+
+// 每次判断下Arr的长度是否到了Length,是的话就返回Arr,否则在Arr上加一个元素,然后递归构造
+
+
+
+ 
