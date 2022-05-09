@@ -82,10 +82,29 @@ type IncludesResult1 = FindInArr<[1,2,3,4,5],4>
 
 type IncludesResult2 = FindInArr<[1,2,3,4,5],6>
 
+// RemoveItem  可以查找自然就可以删除,只需要改下返回结果,构造一个新的数组返回
 
+type RemoveInArr<
+    Arr extends unknown[],
+    RemoveItem,
+    ResultArr extends unknown[] = []> = Arr extends
+    [infer First, ...infer Rest]
+    ? IsEqual2<First,RemoveItem> extends true
+        ? RemoveInArr<Rest,RemoveItem,ResultArr>
+        : RemoveInArr<Rest,RemoveItem,[...ResultArr, First]>
+    : ResultArr
 
+type IsEqual2<A,B> = (A extends B ? true : false) & (B extends A ? true : false)
 
+// 类型参数Arr是待处理的数组,元素类型任意,也就是unknown[],类型参数Item为待查找的元素类型
+// 类型参数ResultArr是构造出来的新数组,默认值是[]
 
+// 通过模式匹配提取数组中的一个元素的类型,如果是Item类型的话就删除,
+// 也就是不放入构造的新数组,直接返回之前的Result
 
+// 否则放入构造的新数组,也就是再构造一个新的数组[...Result.First]
+// 直到模式匹配不再满足,也就是处理完了所有的元素,返回这时候的Result
+
+type RemoveInArrResult = RemoveInArr<[1,2,2,3,4,5],2>
 
 
