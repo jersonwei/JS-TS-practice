@@ -196,3 +196,59 @@ type ReplaceAll2< Str extends string,
     // 那么不断往前插入就相当于把右边的放到了左边,也就完成了字符翻转的功能
     
     type ReverseStrResult = ReverseStr<'wasd'>
+
+
+    // DeepReadonly   对线类型的递归,也叫做索引类型的递归
+
+    // 之前我们有给对象加过readonly以及可选操作符
+
+    // 现在如果这个索引类型的层数不确定该如何处理
+
+    type obj = {
+            a: {
+                b:{
+                    c:{
+                        f:()=>'ding',
+                        d:{
+                            e:{
+                                dong:string
+                            }
+                        }
+                    }
+                }
+            }
+    }
+
+    type DeepReadonlyObj <Obj extends Record<string,any>> = 
+    Obj extends any ?{
+        readonly [Key in keyof Obj]: Obj[Key] extends object
+        ? Obj[Key] extends Function
+            ? Obj[Key]
+            : DeepReadonlyObj<Obj[Key]>
+        : Obj[Key]
+    }
+    : never
+
+    // 类型参数Obj是待处理的索引类型,约束为Record<string,any>也就是索引string,值为任意类型
+
+    // 索引映射自之前的索引,也就是Key in keyof Obj ,只不过加上了readonly的修饰
+
+    // 值要做下判断,如果是object类型并且还是Function,那么久直接取之前的值Obj[Key]
+
+    // 如果是object类型但不是Function,那就是说也是一个索引类型,
+    // 就递归处理Deepreadonly<Obj[Key]>
+
+    // 否则,值不是object就直接返回之前的值Obj[Key]
+
+    type DeepReadonlyObjResult = DeepReadonlyObj<
+            {a:
+                {b:
+                    {name:string,
+                        c:
+                        {
+                            readonly age : number,
+                            gender:number
+                        }
+                    }
+                }
+            }>
