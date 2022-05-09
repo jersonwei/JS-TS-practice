@@ -81,3 +81,16 @@ type Multipy <Num1 extends number,
 // 默认值为[] 相当于从0开始
 
 type MultipyRes = Multipy<2,33>
+
+// Divid  乘法是递归的累加,那除法就是递归的累减
+
+type Divid<Num1 extends number,
+           Num2 extends number,
+           CountArr extends unknown[] = [] > = 
+           Num1 extends 0 ? CountArr['length']
+           : Divid<Substract<Num1,Num2>,Num2,[unknown,...CountArr]>
+     
+// 类型参数Num1和Num2分别是被减数和减数
+// 类型参数CountArr 是用来记录减了几次的累加数组
+// 如果Num1减到了0,那么这时候减了几次就是除法结果.也就是CountArr['length']
+type DividRes = Divid<20,4>
