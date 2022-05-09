@@ -94,3 +94,24 @@ type Divid<Num1 extends number,
 // 类型参数CountArr 是用来记录减了几次的累加数组
 // 如果Num1减到了0,那么这时候减了几次就是除法结果.也就是CountArr['length']
 type DividRes = Divid<20,4>
+
+
+// 数组长度实现计数
+
+// Strlen  数组长度可以取length得到,但是字符串类型不能取length
+
+// 字符串长度不确定.明显要用递归,每次娶一个计数,就是字符长度
+
+type StrLen < Str extends string,
+              CountArr extends unknown[] = [] > = 
+              Str extends `${string}${infer Rest}`
+              ? StrLen<Rest,[...CountArr,unknown]>
+              : CountArr['length']
+
+// 类型参数Str是待处理的字符串,类型参数CountArr是做计数的数组
+// 默认值[]代表从0开始
+
+// 每次通过模式匹配提取去掉一个字符之后的剩余字符串,并且往计数
+// 数组里多放入一个元素,递归进行取字符和计数
+
+type StrLenRes = StrLen<'Hello World'>
