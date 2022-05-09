@@ -151,4 +151,28 @@ type ReplaceAll2< Str extends string,
     // 结束条件是不再满足模式匹配,也就是没有要替换的元素,这是就直接返回字符串Str
 
     type ReplaceAll2Result = ReplaceAll2<'xxxxssss','s','w'> 
-            
+    
+    // StringToUnion   我们想把字符串字面量类型的每个字符都提取出来.组成来联合类型
+    // 也即是把'ding'转为'd' | 'i' | 'n' | 'g'
+    type StringToUnion <Str extends string> = Str extends
+        `${infer One}${infer Two}${infer Three}${infer Four}`
+        ? One|Two|Three|Four
+        : never
+    
+    type StringToUnionResult = StringToUnion<'ding'>
+
+    // 同样如果长度不确定,继续用到递归
+
+    type StringToUnion2 <Str extends string> = Str extends 
+                         `${infer First}${infer Rest}`
+                         ? First | StringToUnion2<Rest>
+                         : never
+                         
+    // 类型参数Str为待处理的字符串类型,通过extends约束为string
+
+    // 通过模式匹配提取到第一个字符到infer声明的局部变量First.其余的
+    // 字符放到局部变量Rest
+
+    // 这样就完成了不确定长度的字符串的提取和联合类型的构造
+
+    type StringToUnion2Result = StringToUnion2<'xdaegdsasd'>
