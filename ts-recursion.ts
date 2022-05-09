@@ -122,5 +122,33 @@ type BuildArray <Length extends number,
 // 每次判断下Arr的长度是否到了Length,是的话就返回Arr,否则在Arr上加一个元素,然后递归构造
 
 
+// 字符串类型的递归
 
- 
+// ReplaceAll  
+
+type ReplaceAll <Str extends string,
+                From extends string,
+                To extends string>
+                = Str extends `${infer Prefix}${From}${infer Suffix}`
+                ? `${Prefix}${To}${Suffix}`
+                : Str
+
+type ReplaceAllResult = ReplaceAll<'xqw','x','w'>
+
+// 但是这里只能处理一个字符的替换,如果要替换多个就要递归替换
+type ReplaceAll2< Str extends string,
+                  From extends string,
+                  To extends string> = Str extends
+                  `${infer Left}${From}${infer Right}`
+                  ? `${Left}${To}${ReplaceAll2<Right,From,To>}`
+                  : Str
+
+    // 类型参数Str是待处理的字符串类型,From是待替换的字符,To是替换到的字符
+    // 通过模式匹配提取From左右的字符串到infer声明的局部变量Left和Right里,
+
+    // 用Left和To构造新的字符串,剩余的Right部分继续递归的替换
+
+    // 结束条件是不再满足模式匹配,也就是没有要替换的元素,这是就直接返回字符串Str
+
+    type ReplaceAll2Result = ReplaceAll2<'xxxxssss','s','w'> 
+            
