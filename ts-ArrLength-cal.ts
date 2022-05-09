@@ -115,3 +115,27 @@ type StrLen < Str extends string,
 // 数组里多放入一个元素,递归进行取字符和计数
 
 type StrLenRes = StrLen<'Hello World'>
+
+
+// GreaterThan  两个值的相互比较
+
+type GreaterThan < Num1 extends number,
+               Num2 extends number,
+               CountArr extends unknown[] = [] > =
+               Num1 extends Num2
+               ? false
+               : CountArr['length'] extends Num2
+                     ? true
+                     : CountArr['length'] extends Num1
+                          ? false
+                          : GreaterThan<Num1,Num2,[...CountArr,unknown]>
+
+// 类型参数Num1和Num2是待比较的两个数
+
+// 类型参数CountArr是计数用的,会不断累加.默认值[]代表从0开始
+
+// 如果Num1 extends Num2 成立 代表相等 直接返回false
+
+// 否则判断计数数组的长度,如果先到了Num2.那就是Num1大,返回true
+
+type GreaterThanRes = GreaterThan<3,56>
