@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            text-align: center;
+        }
+        .aaa {
+            width: 300px;
+            height: 500px;
+            border: 1px solid #000;
+            margin: 0 auto;
+        }
+        .bbb{
+            width: 300px;
+            height: 500px;
+            border: 1px solid #000;
+            margin: 0 auto
+        }
+    </style>
+</head>
+<body>
+        <a href="#111">点我去aaa</a>
+        <a href="#222">点我去bbb</a>
+        <div id="111" class="aaa">
+            我是aaa
+        </div>
+        <div id="222" contenteditable="true" class="bbb">
+            bbb
+        </div>
+        <div>Lorem ipsum dolor sit amet consectetur '
+            adipisicing elit. Sapiente iure fugit recusandae
+         blanditiis eius nulla, placeat corpori
+          s aliquam iste? Suscipi
+          t rerum alias cumque totam quae accusantium minus m
+          agni ratione laboriosam.</div>
+        <button id="btn">回到顶部</button>
+</body>
+</html>
+<script>
+    let btn = document.getElementById('btn')
+    btn.onclick = function(){
+        console.log(123)
+        // 第一种
+        // document.documentElement.scrollTo({
+        //     top:0
+        // })
+
+        // 第二种
+        // document.documentElement.scrollTop = 0
+
+        // 第三种
+        // document.documentElement.scrollIntoView()
+
+        document.documentElement.scrollIntoView({
+            behavior:'smooth',
+            block:'start'
+        })
+
+    }
+</script>
